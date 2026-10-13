@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Logowanie')}"></head>
+<body class="login-page"><main class="login-card">
+<p class="eyebrow">TWOJA PRACA, UPORZĄDKOWANA</p><h1 class="brand">Projectly<span class="brand-dot">.</span></h1>
+<p class="muted">Zaloguj się, aby zobaczyć projekty i zadania.</p>
+<p th:if="${param.error}" class="alert error" role="alert">Niepoprawny login lub hasło, albo konto jest zablokowane.</p>
+<p th:if="${param.logout}" class="alert success" role="status">Wylogowano pomyślnie.</p>
+<form method="post" th:action="@{/login}">
+<label for="username">Login</label><input id="username" name="username" required autofocus autocomplete="username">
+<label for="password">Hasło</label><input id="password" name="password" type="password" required autocomplete="current-password">
+<button class="full">Zaloguj się</button></form>
+</main></body></html>

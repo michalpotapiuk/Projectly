@@ -1,0 +1,28 @@
+spring:
+  config:
+    import: optional:file:./.env[.properties]
+  application:
+    name: Projectly
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:projectly}}
+    username: ${DB_USERNAME:projectly}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  thymeleaf:
+    cache: true
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+projectly:
+  seed:
+    enabled: ${SEED_ENABLED:false}
+    password: ${SEED_PASSWORD:}

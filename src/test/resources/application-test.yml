@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:projectly-test-${random.uuid};MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+projectly:
+  seed:
+    enabled: true
+    password: TestPassword123!

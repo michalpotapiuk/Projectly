@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formularz użytkownika')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<a class="back" th:href="@{/users}">← Użytkownicy</a><h1 th:text="${userId == null ? 'Nowy użytkownik' : 'Edytuj użytkownika'}"></h1>
+<form class="panel form-panel" method="post" th:action="${userId == null ? '/users' : '/users/' + userId + '/edit'}" th:object="${form}">
+<div th:replace="~{fragments/layout :: formErrors}"></div>
+<label for="username">Login</label><input id="username" type="text" th:field="*{username}" required minlength="3" maxlength="50" autocomplete="username"><span class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+<label for="email">Email</label><input id="email" type="email" th:field="*{email}" required maxlength="120"><span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+<div th:if="${userId == null}"><label for="password">Hasło</label><input id="password" name="password" type="password" required minlength="6" maxlength="72" autocomplete="new-password"><span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span></div>
+<label for="firstName">Imię</label><input id="firstName" type="text" th:field="*{firstName}" required maxlength="80"><span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span><label for="lastName">Nazwisko</label><input id="lastName" type="text" th:field="*{lastName}" required maxlength="80"><span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+<label for="role">Rola</label><select id="role" th:field="*{role}" required><option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option></select><span class="field-error" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+<label class="checkbox" for="enabled"><input type="checkbox" id="enabled" th:field="*{enabled}"> Konto aktywne</label>
+<div class="actions"><button>Zapisz użytkownika</button><a th:href="@{/users}">Anuluj</a></div></form>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

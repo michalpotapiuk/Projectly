@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Szczegóły projektu')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<a class="back" th:href="@{/projects}">← Projekty</a>
+<div class="page-heading"><h1 th:text="${project.name}"></h1><a th:if="${isAdmin}" class="button secondary" th:href="@{/projects/{id}/edit(id=${project.id})}">Edytuj projekt</a></div>
+<div class="panel"><p class="description" th:text="${project.description}"></p>
+<p>Właściciel: <strong th:text="${project.owner.username}"></strong></p>
+<p class="muted" th:text="${'Utworzono: ' + #temporals.format(project.createdAt, 'dd.MM.yyyy HH:mm')}"></p></div>
+<section class="panel"><h2>Członkowie</h2><p class="muted">Właściciel ma dostęp automatycznie.</p>
+<ul class="members"><li th:each="member : ${members}"><span th:text="${member.user.username + ' · ' + member.user.firstName + ' ' + member.user.lastName}"></span>
+<form th:if="${isAdmin}" method="post" th:action="@{/projects/{projectId}/members/{userId}/delete(projectId=${project.id},userId=${member.user.id})}" onsubmit="return confirm('Usunąć członka i odpiąć jego zadania?')"><button class="danger small">Usuń członka</button></form></li></ul>
+<p th:if="${#lists.isEmpty(members)}" class="muted">Brak dodatkowych członków.</p>
+<form th:if="${isAdmin}" class="inline-form" method="post" th:action="@{/projects/{id}/members(id=${project.id})}">
+<label for="userId">Dodaj członka</label><select id="userId" name="userId" required><option value="">Wybierz użytkownika</option><option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}"></option></select><button>Dodaj</button></form>
+</section>
+<div class="page-heading"><h2 th:text="${isAdmin ? 'Zadania projektu' : 'Moje zadania w projekcie'}"></h2><a class="button" th:if="${isAdmin}" th:href="@{/projects/{id}/tasks/new(id=${project.id})}">+ Nowe zadanie</a></div>
+<div th:replace="~{tasks/list :: taskTable}"></div>
+<form class="end-action" th:if="${isAdmin}" method="post" th:action="@{/projects/{id}/delete(id=${project.id})}" onsubmit="return confirm('Usunąć projekt wraz z jego zadaniami?')"><button class="danger">Usuń projekt</button></form>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

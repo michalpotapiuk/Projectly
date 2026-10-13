@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Zadania')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<h1 th:text="${pageTitle}"></h1><div th:fragment="taskTable" class="panel table-wrap">
+<p class="muted" th:if="${#lists.isEmpty(tasks)}">Brak zadań do wyświetlenia.</p>
+<table th:unless="${#lists.isEmpty(tasks)}"><thead><tr><th>Zadanie</th><th>Projekt</th><th>Wykonawca</th><th>Status</th><th>Priorytet</th><th>Termin</th><th></th></tr></thead>
+<tbody><tr th:each="task : ${tasks}">
+<td><a th:href="@{/tasks/{id}(id=${task.id})}" th:text="${task.title}"></a></td>
+<td><a th:href="@{/projects/{id}(id=${task.project.id})}" th:text="${task.project.name}"></a></td>
+<td th:text="${task.assignedUser == null ? 'Nieprzypisane' : task.assignedUser.username}"></td>
+<td><span class="badge" th:classappend="${task.status.name()}" th:text="#{__${'status.' + task.status}__}"></span></td>
+<td th:text="#{__${'priority.' + task.priority}__}"></td><td th:text="${task.deadline == null ? '—' : #temporals.format(task.deadline, 'dd.MM.yyyy')}"></td>
+<td><a th:href="@{/tasks/{id}(id=${task.id})}">Otwórz →</a></td>
+</tr></tbody></table></div>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Projekty')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-heading"><div><p class="eyebrow">WSPÓŁPRACA</p><h1>Projekty</h1></div><a th:if="${isAdmin}" class="button" th:href="@{/projects/new}">+ Nowy projekt</a></div>
+<p th:if="${#lists.isEmpty(projects)}" class="panel muted">Nie masz jeszcze dostępnych projektów.</p>
+<div class="project-grid"><article class="panel project-card" th:each="project : ${projects}">
+<p class="eyebrow" th:text="${'Właściciel: ' + project.owner.username}"></p>
+<h2><a th:href="@{/projects/{id}(id=${project.id})}" th:text="${project.name}"></a></h2>
+<p class="description" th:text="${project.description}"></p><p class="muted" th:text="${'Liczba zadań: ' + taskCounts[project.id]}"></p>
+<div class="actions"><a class="button secondary small" th:href="@{/projects/{id}(id=${project.id})}">Szczegóły</a>
+<a th:if="${isAdmin}" th:href="@{/projects/{id}/edit(id=${project.id})}">Edytuj</a>
+<form th:if="${isAdmin}" method="post" th:action="@{/projects/{id}/delete(id=${project.id})}" onsubmit="return confirm('Usunąć projekt wraz z jego zadaniami?')"><button class="danger small">Usuń</button></form></div>
+</article></div>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

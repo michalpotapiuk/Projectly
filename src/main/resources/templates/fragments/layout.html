@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title + ' · Projectly'}">Projectly</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav th:fragment="navbar" class="navbar" sec:authorize="isAuthenticated()">
+    <a class="brand" th:href="@{/dashboard}">Projectly<span class="brand-dot">.</span></a>
+    <div class="nav-links"><a th:href="@{/dashboard}">Pulpit</a><a th:href="@{/projects}">Projekty</a><a th:href="@{/my-tasks}">Moje zadania</a>
+    <a th:if="${isAdmin}" th:href="@{/tasks}">Wszystkie zadania</a><a th:if="${isAdmin}" th:href="@{/users}">Użytkownicy</a></div>
+    <div class="account"><span th:text="${loggedUsername}"></span><form method="post" th:action="@{/logout}"><button class="secondary small">Wyloguj</button></form></div>
+</nav>
+<div th:fragment="messages">
+    <p class="alert success" role="status" th:if="${success}" th:text="${success}"></p>
+    <p class="alert error" role="alert" th:if="${error}" th:text="${error}"></p>
+</div>
+<div th:fragment="formErrors" th:if="${#fields.hasGlobalErrors()}" class="alert error" role="alert">
+    <p th:each="problem : ${#fields.globalErrors()}" th:text="${problem}"></p>
+</div>
+<footer th:fragment="footer" class="footer">Projectly · Projekty i zadania w jednym miejscu</footer>
+</body></html>

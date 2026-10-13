@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Moje zadania')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<p class="eyebrow">TWOJA LISTA PRACY</p><h1>Moje zadania</h1>
+<form method="get" th:action="@{/my-tasks}" class="inline-form filters"><label for="status">Status</label><select id="status" name="status"><option value="">Wszystkie</option><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == selectedStatus}" th:text="#{__${'status.' + status}__}"></option></select><button class="secondary">Filtruj</button></form>
+<div th:replace="~{tasks/list :: taskTable}"></div>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

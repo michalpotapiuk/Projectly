@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Szczegóły zadania')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<a class="back" th:href="@{/my-tasks}">← Moje zadania</a>
+<div class="page-heading"><h1 th:text="${task.title}"></h1><a th:if="${isAdmin}" class="button secondary" th:href="@{/tasks/{id}/edit(id=${task.id})}">Edytuj</a></div>
+<div class="panel"><p class="description" th:text="${task.description}"></p><dl>
+<dt>Projekt</dt><dd><a th:href="@{/projects/{id}(id=${task.project.id})}" th:text="${task.project.name}"></a></dd>
+<dt>Wykonawca</dt><dd th:text="${task.assignedUser == null ? 'Nieprzypisane' : task.assignedUser.username}"></dd>
+<dt>Status</dt><dd><span class="badge" th:classappend="${task.status.name()}" th:text="#{__${'status.' + task.status}__}"></span></dd>
+<dt>Priorytet</dt><dd th:text="#{__${'priority.' + task.priority}__}"></dd>
+<dt>Termin</dt><dd th:text="${task.deadline == null ? '—' : #temporals.format(task.deadline, 'dd.MM.yyyy')}"></dd>
+<dt>Utworzono</dt><dd th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy HH:mm')}"></dd></dl>
+<form class="inline-form" method="post" th:action="@{/tasks/{id}/status(id=${task.id})}"><label for="status">Zmień status</label>
+<select id="status" name="status" required><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == task.status}" th:text="#{__${'status.' + status}__}"></option></select><button>Zapisz status</button></form></div>
+<form th:if="${isAdmin}" method="post" th:action="@{/tasks/{id}/delete(id=${task.id})}" onsubmit="return confirm('Usunąć zadanie?')"><button class="danger">Usuń zadanie</button></form>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

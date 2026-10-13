@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formularz projektu')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<a class="back" th:href="@{/projects}">← Projekty</a><h1 th:text="${projectId == null ? 'Nowy projekt' : 'Edytuj projekt'}"></h1>
+<form class="panel form-panel" method="post" th:action="${projectId == null ? '/projects' : '/projects/' + projectId + '/edit'}" th:object="${form}">
+<div th:replace="~{fragments/layout :: formErrors}"></div>
+<label for="name">Nazwa</label><input id="name" type="text" th:field="*{name}" required maxlength="120"><span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+<label for="description">Opis</label><textarea id="description" th:field="*{description}" rows="4" maxlength="2000"></textarea><span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+<label for="ownerId">Właściciel</label><select id="ownerId" th:field="*{ownerId}" required><option value="">Wybierz właściciela</option><option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}"></option></select><span class="field-error" th:if="${#fields.hasErrors('ownerId')}" th:errors="*{ownerId}"></span>
+<div class="actions"><button>Zapisz projekt</button><a th:href="@{/projects}">Anuluj</a></div></form>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

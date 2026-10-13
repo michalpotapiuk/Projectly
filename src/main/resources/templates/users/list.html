@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Użytkownicy')}"></head>
+<body><nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container"><div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-heading"><div><p class="eyebrow">ADMINISTRACJA</p><h1>Użytkownicy</h1></div><a class="button" th:href="@{/users/new}">+ Nowy użytkownik</a></div>
+<div class="panel table-wrap"><table><thead><tr><th>Login</th><th>Email</th><th>Imię i nazwisko</th><th>Rola</th><th>Konto</th><th>Akcje</th></tr></thead>
+<tbody><tr th:each="user : ${users}"><td th:text="${user.username}"></td><td th:text="${user.email}"></td><td th:text="${user.firstName + ' ' + user.lastName}"></td><td th:text="${user.role}"></td><td th:text="${user.enabled ? 'Aktywne' : 'Zablokowane'}"></td>
+<td><div class="actions"><a th:href="@{/users/{id}/edit(id=${user.id})}">Edytuj</a><form method="post" th:action="@{/users/{id}/delete(id=${user.id})}" onsubmit="return confirm('Usunąć konto? Konto z powiązaniami zostanie zablokowane.')"><button class="danger small">Usuń / zablokuj</button></form></div></td></tr></tbody></table></div>
+</main><footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

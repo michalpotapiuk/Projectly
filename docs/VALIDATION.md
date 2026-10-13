@@ -7,7 +7,8 @@ Spring Boot 3.5.16, Hibernate, H2 w trybie zgodności z PostgreSQL.
 
 Polecenie: `./mvnw clean verify`.
 
-Wynik: 37 testów, 0 błędów, 0 niepowodzeń, 0 pominiętych testów.
+Wynik aktualnego budowania: 46 testów, w tym 4 jednostkowe i 42 integracyjne,
+0 błędów, 0 niepowodzeń, 0 pominiętych testów.
 
 | Klasa | Liczba | Zakres |
 |---|---:|---|
@@ -15,8 +16,13 @@ Wynik: 37 testów, 0 błędów, 0 niepowodzeń, 0 pominiętych testów.
 | ProjectServiceTest | 8 | Utworzenie, członkostwo, duplikaty, właściciel, odpinanie zadań, usuwanie kaskadowe, dostęp |
 | TaskServiceTest | 8 | Utworzenie, wykonawca, brak projektu, filtrowanie, status, cudze zadania, blokada konta |
 | WebFlowTest | 13 | Logowanie, widoki, CSRF, walidacja, 400/403/404, izolacja projektów, pełny CRUD |
+| DataInitializerTest | 5 | Reset jednego hasła, zachowanie danych i innych kont, brak resetu domyślnie, nieistniejący login, walidacja hasła |
+| BusinessRulesUnitTest | 4 | Zajęty login, duplikat członkostwa, wykonawca spoza projektu, zmiana cudzego zadania |
 
 Testy usług używają rzeczywistych repozytoriów i transakcji z wycofaniem danych.
+Dotyczy to testów integracyjnych. `BusinessRulesUnitTest` tworzy obiekty usług
+bez Springa i używa mocków Mockito. Nie uruchamia bazy ani Dockera i nie korzysta
+z `@SpringBootTest`.
 Testy MVC nie mają transakcji obejmującej cały test: szablony renderują się po
 zakończeniu transakcji usługi, przy `spring.jpa.open-in-view=false`. Dzięki temu
 wykrywają również brak pobrania relacji potrzebnych widokom. Każdy kontekst
@@ -57,3 +63,6 @@ Wynik sprawdzenia: poprawny. Tymczasowe dane sprawdzenia zostały usunięte.
 
 Na koniec baza zawierała 3 użytkowników, 2 projekty, 3 członkostwa i 4 zadania
 demonstracyjne. Kontener PostgreSQL pozostawiono uruchomiony.
+
+Dodano opcjonalny reset hasła przez SEED_RESET_USER. Nowe testy wykonano wyłącznie
+na bazach H2 z wycofaniem transakcji; nie resetowano haseł w lokalnym PostgreSQL.

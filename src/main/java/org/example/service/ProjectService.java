@@ -3,8 +3,8 @@ package org.example.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.example.Model.dto.ProjectForm;
-import org.example.Model.entity.*;
+import org.example.model.dto.ProjectForm;
+import org.example.model.entity.*;
 import org.example.exception.*;
 import org.example.repository.*;
 

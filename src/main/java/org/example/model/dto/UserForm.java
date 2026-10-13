@@ -1,41 +1,36 @@
-package org.example.Model.entity;
+package org.example.model.dto;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
-import org.example.Model.enums.*;
+import org.example.model.enums.Role;
 
-@Entity
-@Table(name = "app_users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserForm {
+    public interface Create extends jakarta.validation.groups.Default {}
 
-    @Column(nullable = false, unique = true, length = 50)
+    @NotBlank
+    @Pattern(regexp = "[a-zA-Z0-9._-]{3,50}", message = "Login: 3–50 liter, cyfr lub znaków ._-")
     private String username;
 
-    @Column(nullable = false, unique = true, length = 120)
+    @NotBlank
+    @Email
+    @Size(max = 120)
     private String email;
 
-    @Column(nullable = false, length = 100)
+    @NotBlank(groups = Create.class)
+    @Size(min = 6, max = 72, groups = Create.class)
     private String password;
 
-    @Column(nullable = false, length = 80)
+    @NotBlank
+    @Size(max = 80)
     private String firstName;
 
-    @Column(nullable = false, length = 80)
+    @NotBlank
+    @Size(max = 80)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private Role role;
+    @NotNull private Role role = Role.USER;
 
-    @Column(nullable = false)
-    private boolean enabled;
-
-    public Long getId() {
-        return id;
-    }
+    private boolean enabled = true;
 
     public String getUsername() {
         return username;

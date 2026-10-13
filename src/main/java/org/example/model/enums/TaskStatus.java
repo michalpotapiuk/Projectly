@@ -1,4 +1,4 @@
-package org.example.Model.enums;
+package org.example.model.enums;
 
 public enum TaskStatus {
     TODO,

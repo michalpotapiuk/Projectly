@@ -1,4 +1,4 @@
-package org.example.Controller;
+package org.example.controller;
 
 import jakarta.validation.Valid;
 
@@ -9,7 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import org.example.Model.dto.ProjectForm;
+import org.example.model.dto.ProjectForm;
 import org.example.exception.BusinessException;
 import org.example.service.*;
 

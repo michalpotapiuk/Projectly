@@ -3,9 +3,9 @@ package org.example.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.example.Model.dto.TaskForm;
-import org.example.Model.entity.*;
-import org.example.Model.enums.TaskStatus;
+import org.example.model.dto.TaskForm;
+import org.example.model.entity.*;
+import org.example.model.enums.TaskStatus;
 import org.example.exception.*;
 import org.example.repository.*;
 

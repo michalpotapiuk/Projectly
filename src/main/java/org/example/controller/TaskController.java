@@ -1,4 +1,4 @@
-package org.example.Controller;
+package org.example.controller;
 
 import jakarta.validation.Valid;
 
@@ -7,9 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import org.example.Model.dto.TaskForm;
-import org.example.Model.entity.Task;
-import org.example.Model.enums.*;
+import org.example.model.dto.TaskForm;
+import org.example.model.entity.Task;
+import org.example.model.enums.*;
 import org.example.exception.BusinessException;
 import org.example.service.*;
 

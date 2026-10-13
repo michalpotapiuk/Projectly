@@ -10,3 +10,4 @@ projectly:
   seed:
     enabled: true
     password: TestPassword123!
+    reset-user: ""

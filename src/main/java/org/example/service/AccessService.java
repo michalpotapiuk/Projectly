@@ -1,9 +1,9 @@
 package org.example.service;
 
-import org.example.Model.entity.Project;
-import org.example.Model.entity.Task;
-import org.example.Model.entity.User;
-import org.example.Model.enums.Role;
+import org.example.model.entity.Project;
+import org.example.model.entity.Task;
+import org.example.model.entity.User;
+import org.example.model.enums.Role;
 import org.example.repository.ProjectMemberRepository;
 import org.example.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;

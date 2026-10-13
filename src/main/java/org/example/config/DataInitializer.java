@@ -1,12 +1,12 @@
 package org.example.config;
 
-import org.example.Model.entity.Project;
-import org.example.Model.entity.ProjectMember;
-import org.example.Model.entity.Task;
-import org.example.Model.entity.User;
-import org.example.Model.enums.Priority;
-import org.example.Model.enums.Role;
-import org.example.Model.enums.TaskStatus;
+import org.example.model.entity.Project;
+import org.example.model.entity.ProjectMember;
+import org.example.model.entity.Task;
+import org.example.model.entity.User;
+import org.example.model.enums.Priority;
+import org.example.model.enums.Role;
+import org.example.model.enums.TaskStatus;
 import org.example.repository.ProjectMemberRepository;
 import org.example.repository.ProjectRepository;
 import org.example.repository.TaskRepository;
@@ -19,16 +19,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Locale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @ConditionalOnProperty(name = "projectly.seed.enabled", havingValue = "true")
 public class DataInitializer implements CommandLineRunner {
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
     private final UserRepository users;
     private final ProjectRepository projects;
     private final ProjectMemberRepository members;
     private final TaskRepository tasks;
     private final PasswordEncoder encoder;
     private final String password;
+    private final String resetUser;
 
     public DataInitializer(
             UserRepository users,
@@ -36,26 +41,29 @@ public class DataInitializer implements CommandLineRunner {
             ProjectMemberRepository members,
             TaskRepository tasks,
             PasswordEncoder encoder,
-            @Value("${projectly.seed.password}") String password) {
+            @Value("${projectly.seed.password}") String password,
+            @Value("${projectly.seed.reset-user:}") String resetUser) {
         this.users = users;
         this.projects = projects;
         this.members = members;
         this.tasks = tasks;
         this.encoder = encoder;
         this.password = password;
+        this.resetUser = resetUser;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+        if (!resetUser.isBlank()) {
+            resetPassword();
+            return;
+        }
         if (users.count() != 0
                 || projects.count() != 0
                 || members.count() != 0
                 || tasks.count() != 0) return;
-        if (password.length() < 6
-                || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
-            throw new IllegalStateException(
-                    "Ustaw SEED_PASSWORD: minimum 6 znaków, maksymalnie 72 bajty UTF-8.");
+        validatePassword();
         User admin = user("admin", "Administrator", "Projectly", Role.ADMIN);
         User anna = user("anna", "Anna", "Kowalska", Role.USER);
         User jan = user("jan", "Jan", "Nowak", Role.USER);
@@ -76,6 +84,24 @@ public class DataInitializer implements CommandLineRunner {
         task(first, "Napisać opis koła", jan, TaskStatus.IN_PROGRESS, Priority.MEDIUM);
         task(second, "Zarezerwować salę", anna, TaskStatus.DONE, Priority.HIGH);
         task(second, "Przygotować materiały", jan, TaskStatus.TODO, Priority.LOW);
+    }
+
+    private void resetPassword() {
+        validatePassword();
+        String username = resetUser.trim().toLowerCase(Locale.ROOT);
+        User user = users.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Nie istnieje użytkownik do resetu hasła: " + username));
+        user.setPassword(encoder.encode(password));
+        users.saveAndFlush(user);
+        logger.warn("Zresetowano hasło konta '{}'. Usuń SEED_RESET_USER po wykonaniu resetu.", username);
+    }
+
+    private void validatePassword() {
+        if (password.length() < 6
+                || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
+            throw new IllegalStateException(
+                    "Ustaw SEED_PASSWORD: minimum 6 znaków, maksymalnie 72 bajty UTF-8.");
     }
 
     private User user(String username, String firstName, String lastName, Role role) {

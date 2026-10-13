@@ -10,9 +10,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.example.Model.dto.*;
-import org.example.Model.entity.*;
-import org.example.Model.enums.*;
+import org.example.model.dto.*;
+import org.example.model.entity.*;
+import org.example.model.enums.*;
 import org.example.exception.*;
 import org.example.repository.*;
 import org.example.service.*;

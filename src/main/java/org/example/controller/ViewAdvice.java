@@ -1,10 +1,10 @@
-package org.example.Controller;
+package org.example.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import org.example.Model.enums.Role;
+import org.example.model.enums.Role;
 import org.example.repository.UserRepository;
 
 @ControllerAdvice

@@ -1,76 +1,120 @@
 # Projectly
 
-Prosta aplikacja MVC do zarządzania projektami i zadaniami, przygotowana na zaliczenie.
-Punktem wyjścia jest [Taskmaster](https://github.com/michalpotapiuk/Taskmaster) w rewizji
-`202359fd90d03c598769d3d3de76631261ff0a59` oraz dostarczona specyfikacja implementacyjna.
-Projectly jest oddzielnym, uproszczonym projektem: model projektu, zadania i użytkownika
-został dostosowany do specyfikacji, a frontend napisany od nowa w Thymeleaf.
+Projectly to aplikacja webowa do zarządzania projektami, członkami zespołów
+i zadaniami. Administrator zarządza kontami i organizacją pracy, a użytkownicy
+przeglądają dostępne projekty oraz aktualizują status swoich zadań.
+Aplikacja wykorzystuje architekturę MVC i widoki Thymeleaf.
 
 ## Technologie i wymagania
 
 - JDK 21 (ustaw `JAVA_HOME` na instalację JDK 21).
 - Spring Boot 3.5.16, Spring MVC, Spring Security.
 - Hibernate / Spring Data JPA, Jakarta Validation, Thymeleaf.
-- PostgreSQL 17 uruchamiany przez Docker Compose; H2 w pamięci do demonstracji i testów.
+- PostgreSQL 17 uruchamiany przez Docker Compose; H2 do testów integracyjnych.
 - Docker Desktop z Docker Compose do uruchomienia bazy.
 - Maven 3.9.11 pobierany przez dołączony Maven Wrapper; nie trzeba instalować Maven.
 - Dostęp do internetu podczas pierwszego budowania.
 
-## Szybka demonstracja bez konfiguracji bazy
-
-Linux / macOS:
-
-```sh
-./mvnw spring-boot:run -Dspring-boot.run.profiles=demo
-```
-
-Windows:
-
-```powershell
-.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=demo"
-```
-
-Otwórz http://localhost:8080. Konta demonstracyjne:
-
-| Login | Hasło domyślne | Rola |
-|---|---|---|
-| admin | Projectly123! | ADMIN |
-| anna | Projectly123! | USER |
-| jan | Projectly123! | USER |
-
-Hasło możesz zastąpić przez zmienną `SEED_PASSWORD`. Profil `demo` tworzy bazę H2
-w pamięci, dwa projekty i cztery zadania. Dane znikają po zatrzymaniu aplikacji.
-Nie włączaj profilu demonstracyjnego dla publicznego wdrożenia.
-Jeżeli istnieje lokalny plik `.env`, hasło z jego `SEED_PASSWORD` obowiązuje także
-w profilu `demo`, zamiast hasła domyślnego w tabeli.
-
-## PostgreSQL w Dockerze
+## Uruchomienie projektu z PostgreSQL w Dockerze
 
 Docker uruchamia bazę danych, a aplikacja Spring Boot działa lokalnie w IntelliJ
 lub przez Maven. Plik `compose.yaml` zawiera oficjalny obraz `postgres:17-alpine`,
 trwały wolumen danych i kontrolę gotowości bazy.
 
-1. Uruchom Docker Desktop.
-2. W katalogu projektu utwórz `.env` na podstawie `.env.example`, jeśli jeszcze go
-   nie ma. Ustaw własne `DB_PASSWORD` i `SEED_PASSWORD`. W lokalnym projekcie
-   przygotowanym przez asystenta plik `.env` już zawiera losowo wygenerowane hasła.
-   Nie nadpisuj tego pliku przy kolejnych uruchomieniach.
+### 1. Przygotuj projekt
 
-3. Z katalogu projektu uruchom bazę, a następnie aplikację:
+Otwórz projekt w IntelliJ IDEA, ustaw JDK 21 i przeładuj Maven.
+Polecenia wykonuj w głównym katalogu projektu, obok `pom.xml` i `compose.yaml`.
+
+### 2. Przygotuj konfigurację
+
+Jeśli nie masz pliku `.env`, skopiuj `.env.example`:
+
+```sh
+cp .env.example .env
+```
+
+W Windows PowerShell użyj `Copy-Item .env.example .env`.
+Istniejącego pliku `.env` nie nadpisuj. Ustaw własne hasła:
+
+```properties
+DB_NAME=projectly
+DB_USERNAME=projectly
+DB_PASSWORD=TwojeHasloBazy123!
+DB_HOST=localhost
+DB_PORT=5432
+SEED_ENABLED=true
+SEED_PASSWORD=TwojeHasloPoczatkowe123!
+SEED_RESET_USER=
+```
+
+Powyższe hasła są przykładami. `DB_PASSWORD` służy do połączenia z PostgreSQL,
+a `SEED_PASSWORD` do pierwszego utworzenia kont w aplikacji. Hasło początkowe
+musi mieć minimum 6 znaków i maksymalnie 72 bajty UTF-8.
+
+### 3. Uruchom bazę
+
+Uruchom Docker Desktop, a następnie:
 
 ```sh
 docker compose up -d --wait
+docker compose ps
+```
+
+Kontener PostgreSQL powinien mieć stan `healthy`. Docker przygotuje bazę
+`projectly` oraz użytkownika wskazanego w `.env`.
+
+### 4. Uruchom aplikację
+
+```sh
 ./mvnw spring-boot:run
 ```
 
-Windows PowerShell: użyj tych samych poleceń Docker oraz
-`.\mvnw.cmd spring-boot:run`.
+W Windows PowerShell użyj `.\mvnw.cmd spring-boot:run`.
+W IntelliJ możesz zamiast tego uruchomić klasę `org.example.ProjectlyApplication`.
+Ustaw JDK 21, katalog roboczy na folder Projectly i pozostaw pole
+`Active profiles` puste.
 
-4. Otwórz http://localhost:8080. Przy pierwszym uruchomieniu pustej bazy
-   `SEED_ENABLED=true` tworzy konta `admin`, `anna`, `jan` z hasłem
-   z lokalnego `SEED_PASSWORD`, oraz dane przykładów. Hasła zapisują się jako
-   BCrypt. Inicjalizator działa tylko wtedy, gdy wszystkie cztery tabele są puste.
-   Po utworzeniu kont można ustawić `SEED_ENABLED=false`.
+### 5. Zaloguj się
+
+Otwórz [http://localhost:8080](http://localhost:8080).
+Przy pierwszym uruchomieniu pustej bazy i `SEED_ENABLED=true` aplikacja utworzy:
+
+| Login | Hasło początkowe | Rola |
+|---|---|---|
+| admin | wartość `SEED_PASSWORD` z `.env` | ADMIN |
+| anna | wartość `SEED_PASSWORD` z `.env` | USER |
+| jan | wartość `SEED_PASSWORD` z `.env` | USER |
+
+Utworzone zostaną również dwa przykładowe projekty, członkostwa i cztery zadania.
+Hasła zapisują się jako hashe BCrypt. Inicjalizator tworzy te dane tylko wtedy,
+gdy wszystkie cztery tabele są puste. Po utworzeniu kont można ustawić
+`SEED_ENABLED=false`.
+
+Nowe konta tworzysz jako administrator przez `Użytkownicy → Nowy użytkownik`.
+Zaznacz `Konto aktywne`, nadaj rolę i hasło. Użytkownik może od razu zalogować się
+loginem i hasłem z formularza, bez restartu aplikacji. `SEED_PASSWORD` nie wpływa
+na hasła kont tworzonych przez formularz.
+
+### Reset hasła istniejącego konta
+
+Reset nie wymaga usuwania bazy ani wolumenu. Zatrzymaj aplikację i w lokalnym
+pliku `.env` ustaw:
+
+```properties
+SEED_ENABLED=true
+SEED_PASSWORD=WybraneNoweHaslo123!
+SEED_RESET_USER=admin
+```
+
+Uruchom ponownie aplikację. `DataInitializer` zmieni wyłącznie hasło wskazanego
+użytkownika, zapisując hash BCrypt. Nie zmieni jego roli, aktywności, projektów
+ani zadań. Inne konta zachowają swoje hasła. Możesz wskazać inny login zamiast
+`admin`. Nieistniejący login lub niepoprawne hasło zatrzyma uruchomienie z błędem.
+
+Po udanym resecie usuń `SEED_RESET_USER` z `.env` lub pozostaw pustą wartość:
+`SEED_RESET_USER=`. W przeciwnym razie reset powtórzy się przy kolejnym starcie.
+Bez tej opcji inicjalizator nadal tworzy dane jedynie w pustej bazie.
 
 Konfiguracja PostgreSQL jest domyślna. Compose i Spring Boot wczytują ten sam
 lokalny plik `.env`; jest pomijany przez Git. Stosuj prosty zapis
@@ -94,9 +138,7 @@ użyją nowego portu. Pełny adres można nadpisać zmienną `DB_URL` w aplikacj
 Baza jest udostępniona tylko na interfejsie `127.0.0.1`.
 
 W IntelliJ ustaw JDK 21 i katalog roboczy na katalog główny Projectly.
-Uruchom `org.example.ProjectlyApplication` bez profilu `demo`, aby użyć PostgreSQL.
 Hibernate tworzy i aktualizuje schemat przez `ddl-auto=update`.
-Aplikacja nie migruje danych ze starego Taskmastera ani MySQL.
 
 Przydatne polecenia:
 
@@ -121,23 +163,32 @@ Wczytywanie pliku konfiguracyjnego:
 
 ```sh
 ./mvnw clean verify
-java -jar target/projectly-1.0.0.jar --spring.profiles.active=demo
 ```
 
-Możesz także uruchomić plik JAR z PostgreSQL z głównego katalogu projektu,
-bez opcji profilu, po uruchomieniu bazy:
+Możesz także uruchomić zbudowany plik JAR z głównego katalogu projektu,
+po uruchomieniu bazy:
 
 ```sh
 java -jar target/projectly-1.0.0.jar
 ```
 
-Aktualny plik JAR powstaje w `target/`. Plik w głównym folderze również jest
-odświeżany przy przygotowaniu projektu przez asystenta.
+Aktualny plik JAR powstaje w `target/`.
 
-Testy wykorzystują oddzielne bazy H2, rzeczywiste repozytoria JPA i MockMvc.
+Testy integracyjne wykorzystują oddzielne bazy H2, rzeczywiste repozytoria JPA i MockMvc.
 Sprawdzają użytkowników, projekty, członkostwa, zadania, uprawnienia, logowanie,
 CSRF, walidację oraz renderowanie wszystkich widoków przy wyłączonym Open Session
 in View. Nie wymagają uruchomionej bazy PostgreSQL.
+
+Cztery testy jednostkowe w `BusinessRulesUnitTest` uruchamiają zwykłe obiekty
+usług z zależnościami zastąpionymi przez Mockito, bez kontekstu Springa, bazy
+i Dockera. Sprawdzają zajęty login, duplikat członkostwa, przypisanie zadania
+osobie spoza projektu oraz odmowę zmiany statusu cudzego zadania. Kontrolują
+również brak zapisu niepoprawnych danych i zachowanie pierwotnego statusu.
+Możesz uruchomić wyłącznie te testy:
+
+```sh
+./mvnw -Dtest=BusinessRulesUnitTest test
+```
 
 ## Funkcjonalności
 
@@ -157,7 +208,6 @@ USER:
 
 Zakres nie obejmuje zespołów, diagramów, notatek, raportów, ewidencji czasu,
 zgłoszeń, podzadań, komentarzy, plików, powiadomień ani osobnego frontendu REST.
-Są to zbędne funkcje oryginalnego Taskmastera lub funkcje wykluczone specyfikacją.
 
 ## Struktura
 
@@ -165,19 +215,18 @@ Są to zbędne funkcje oryginalnego Taskmastera lub funkcje wykluczone specyfika
 src/main/java/org/example/
 ├── ProjectlyApplication.java
 ├── config/        SecurityConfig, DataInitializer
-├── MOdel/
+├── model/
 │   ├── entity/    User, Project, ProjectMember, Task
 │   ├── enums/     Role, TaskStatus, Priority
 │   └── dto/       UserForm, ProjectForm, TaskForm
 ├── repository/    cztery interfejsy JpaRepository
 ├── service/       UserService, ProjectService, TaskService, AccessService
-├── Controller/    logowanie, dashboard, projekty, zadania, użytkownicy
+├── controller/    logowanie, dashboard, projekty, zadania, użytkownicy
 └── exception/     wyjątki i obsługa 400/403/404/409
 src/main/resources/
 ├── templates/     fragmenty, login, dashboard, projects, tasks, users, error
 ├── static/css/    responsywny CSS bez zewnętrznych zależności
-├── application.yml
-└── application-demo.yml
+└── application.yml
 src/test/          testy usług i przepływów MVC
 ```
 
@@ -231,7 +280,7 @@ Dodatkowe zasady:
 
 ## Scenariusz prezentacji
 
-1. Uruchom profil `demo` i zaloguj się jako `admin`.
+1. Uruchom PostgreSQL przez Docker Compose, następnie aplikację i zaloguj się jako `admin`.
 2. Utwórz użytkownika, projekt i członkostwo; dodaj zadanie z wykonawcą.
 3. Pokaż walidację pustego tytułu i odmowę ponownego dodania członka.
 4. Zaloguj się jako wykonawca i zmień status zadania.

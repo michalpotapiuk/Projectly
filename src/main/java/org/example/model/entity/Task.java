@@ -1,9 +1,9 @@
-package org.example.Model.entity;
+package org.example.model.entity;
 
 import jakarta.persistence.*;
 
-import org.example.Model.enums.Priority;
-import org.example.Model.enums.TaskStatus;
+import org.example.model.enums.Priority;
+import org.example.model.enums.TaskStatus;
 
 import java.time.*;
 

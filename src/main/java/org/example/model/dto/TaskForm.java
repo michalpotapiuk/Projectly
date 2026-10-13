@@ -1,9 +1,9 @@
-package org.example.Model.dto;
+package org.example.model.dto;
 
 import jakarta.validation.constraints.*;
 
-import org.example.Model.enums.Priority;
-import org.example.Model.enums.TaskStatus;
+import org.example.model.enums.Priority;
+import org.example.model.enums.TaskStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;

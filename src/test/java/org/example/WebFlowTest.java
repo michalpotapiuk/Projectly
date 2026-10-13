@@ -13,7 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import org.example.Model.dto.ProjectForm;
+import org.example.model.dto.ProjectForm;
 import org.example.repository.*;
 import org.example.service.ProjectService;
 

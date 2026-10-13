@@ -2,7 +2,7 @@ package org.example.repository;
 
 import org.springframework.data.jpa.repository.*;
 
-import org.example.Model.entity.*;
+import org.example.model.entity.*;
 
 import java.util.List;
 

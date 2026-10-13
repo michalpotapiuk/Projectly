@@ -1,4 +1,4 @@
-package org.example.Controller;
+package org.example.controller;
 
 import org.springframework.validation.BindingResult;
 

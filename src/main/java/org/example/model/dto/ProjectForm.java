@@ -1,4 +1,4 @@
-package org.example.Model.dto;
+package org.example.model.dto;
 
 import jakarta.validation.constraints.*;
 

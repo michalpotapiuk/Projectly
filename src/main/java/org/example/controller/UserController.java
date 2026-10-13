@@ -1,4 +1,4 @@
-package org.example.Controller;
+package org.example.controller;
 
 import jakarta.validation.Valid;
 
@@ -9,8 +9,8 @@ import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import org.example.Model.dto.UserForm;
-import org.example.Model.enums.Role;
+import org.example.model.dto.UserForm;
+import org.example.model.enums.Role;
 import org.example.exception.BusinessException;
 import org.example.service.UserService;
 

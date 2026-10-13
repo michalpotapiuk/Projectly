@@ -1,7 +1,7 @@
 package org.example.repository;
 
-import org.example.Model.entity.User;
-import org.example.Model.enums.Role;
+import org.example.model.entity.User;
+import org.example.model.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

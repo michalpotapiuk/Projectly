@@ -26,3 +26,4 @@ projectly:
   seed:
     enabled: ${SEED_ENABLED:false}
     password: ${SEED_PASSWORD:}
+    reset-user: ${SEED_RESET_USER:}

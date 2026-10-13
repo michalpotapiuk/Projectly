@@ -2,8 +2,8 @@ package org.example.repository;
 
 import org.springframework.data.jpa.repository.*;
 
-import org.example.Model.entity.*;
-import org.example.Model.enums.TaskStatus;
+import org.example.model.entity.*;
+import org.example.model.enums.TaskStatus;
 
 import java.util.*;
 

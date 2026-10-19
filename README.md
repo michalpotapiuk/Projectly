@@ -1,146 +1,153 @@
 # Projectly
 
-Projectly to aplikacja webowa do zarządzania projektami, członkami zespołów
-i zadaniami. Administrator zarządza kontami i organizacją pracy, a użytkownicy
-przeglądają dostępne projekty oraz aktualizują status swoich zadań.
-Aplikacja wykorzystuje architekturę MVC i widoki Thymeleaf.
+Projectly is a web application for managing projects, team members, and tasks.
+Administrators manage accounts and organize work, while users browse available
+projects and update the status of their tasks.
+The application uses an MVC architecture and Thymeleaf views.
 
-## Technologie i wymagania
+## Technologies and requirements
 
-- JDK 21 (ustaw `JAVA_HOME` na instalację JDK 21).
+- JDK 21 (set `JAVA_HOME` to your JDK 21 installation).
 - Spring Boot 3.5.16, Spring MVC, Spring Security.
 - Hibernate / Spring Data JPA, Jakarta Validation, Thymeleaf.
-- PostgreSQL 17 uruchamiany przez Docker Compose; H2 do testów integracyjnych.
-- Docker Desktop z Docker Compose do uruchomienia bazy.
-- Maven 3.9.11 pobierany przez dołączony Maven Wrapper; nie trzeba instalować Maven.
-- Dostęp do internetu podczas pierwszego budowania.
+- PostgreSQL 17 running through Docker Compose; H2 for integration tests.
+- Docker Desktop with Docker Compose to run the database.
+- Maven 3.9.11 downloaded by the included Maven Wrapper; no Maven installation is required.
+- Internet access during the first build.
 
-## Uruchomienie projektu z PostgreSQL w Dockerze
+## Running the project with PostgreSQL in Docker
 
-Docker uruchamia bazę danych, a aplikacja Spring Boot działa lokalnie w IntelliJ
-lub przez Maven. Plik `compose.yaml` zawiera oficjalny obraz `postgres:17-alpine`,
-trwały wolumen danych i kontrolę gotowości bazy.
+Docker runs the database, while the Spring Boot application runs locally in IntelliJ
+or through Maven. The `compose.yaml` file uses the official `postgres:17-alpine` image,
+a persistent data volume, and a database health check.
 
-### 1. Przygotuj projekt
+### 1. Prepare the project
 
-Otwórz projekt w IntelliJ IDEA, ustaw JDK 21 i przeładuj Maven.
-Polecenia wykonuj w głównym katalogu projektu, obok `pom.xml` i `compose.yaml`.
+Open the project in IntelliJ IDEA, select JDK 21, and reload Maven.
+Run commands from the project root, alongside `pom.xml` and `compose.yaml`.
 
-### 2. Przygotuj konfigurację
+### 2. Prepare the configuration
 
-Jeśli nie masz pliku `.env`, skopiuj `.env.example`:
+If you do not have an `.env` file, copy `.env.example`:
 
 ```sh
 cp .env.example .env
 ```
 
-W Windows PowerShell użyj `Copy-Item .env.example .env`.
-Istniejącego pliku `.env` nie nadpisuj. Ustaw własne hasła:
+In Windows PowerShell, use `Copy-Item .env.example .env`.
+Do not overwrite an existing `.env` file. Set your own passwords:
 
 ```properties
 DB_NAME=projectly
 DB_USERNAME=projectly
-DB_PASSWORD=TwojeHasloBazy123!
+DB_PASSWORD=YourDatabasePassword123!
 DB_HOST=localhost
 DB_PORT=5432
 SEED_ENABLED=true
-SEED_PASSWORD=TwojeHasloPoczatkowe123!
+SEED_PASSWORD=YourInitialPassword123!
 SEED_RESET_USER=
 ```
 
-Powyższe hasła są przykładami. `DB_PASSWORD` służy do połączenia z PostgreSQL,
-a `SEED_PASSWORD` do pierwszego utworzenia kont w aplikacji. Hasło początkowe
-musi mieć minimum 6 znaków i maksymalnie 72 bajty UTF-8.
+The passwords above are examples. `DB_PASSWORD` is used to connect to PostgreSQL,
+while `SEED_PASSWORD` is used when application accounts are first created.
+The initial password must contain at least 6 characters and no more than 72 UTF-8 bytes.
 
-### 3. Uruchom bazę
+### 3. Start the database
 
-Uruchom Docker Desktop, a następnie:
+Start Docker Desktop, then run:
 
 ```sh
 docker compose up -d --wait
 docker compose ps
 ```
 
-Kontener PostgreSQL powinien mieć stan `healthy`. Docker przygotuje bazę
-`projectly` oraz użytkownika wskazanego w `.env`.
+The PostgreSQL container should have a `healthy` status. Docker creates the
+`projectly` database and the user specified in `.env`.
 
-### 4. Uruchom aplikację
+### 4. Start the application
 
 ```sh
 ./mvnw spring-boot:run
 ```
 
-W Windows PowerShell użyj `.\mvnw.cmd spring-boot:run`.
-W IntelliJ możesz zamiast tego uruchomić klasę `org.example.ProjectlyApplication`.
-Ustaw JDK 21, katalog roboczy na folder Projectly i pozostaw pole
-`Active profiles` puste.
+In Windows PowerShell, use `.\mvnw.cmd spring-boot:run`.
+Alternatively, run the `org.example.ProjectlyApplication` class in IntelliJ.
+Select JDK 21, set the working directory to the Projectly folder, and leave
+`Active profiles` empty.
 
-### 5. Zaloguj się
+### 5. Log in as an administrator
 
-Otwórz [http://localhost:8080](http://localhost:8080).
-Przy pierwszym uruchomieniu pustej bazy i `SEED_ENABLED=true` aplikacja utworzy:
+Open [http://localhost:8080](http://localhost:8080).
+Log in with the username `admin` and the account's current password.
 
-| Login | Hasło początkowe | Rola |
-|---|---|---|
-| admin | wartość `SEED_PASSWORD` z `.env` | ADMIN |
-| anna | wartość `SEED_PASSWORD` z `.env` | USER |
-| jan | wartość `SEED_PASSWORD` z `.env` | USER |
+When an empty database is first started with `SEED_ENABLED=true`, the initializer
+creates an administrator account with the password specified by `SEED_PASSWORD`.
+If the database already contains data, changing this value does not change existing
+passwords. Use the password set when the account was created or last reset.
+If you do not know it, follow the reset procedure below.
 
-Utworzone zostaną również dwa przykładowe projekty, członkostwa i cztery zadania.
-Hasła zapisują się jako hashe BCrypt. Inicjalizator tworzy te dane tylko wtedy,
-gdy wszystkie cztery tabele są puste. Po utworzeniu kont można ustawić
-`SEED_ENABLED=false`.
+Passwords are stored as BCrypt hashes. After the initial data has been created,
+you can set `SEED_ENABLED=false`.
 
-Nowe konta tworzysz jako administrator przez `Użytkownicy → Nowy użytkownik`.
-Zaznacz `Konto aktywne`, nadaj rolę i hasło. Użytkownik może od razu zalogować się
-loginem i hasłem z formularza, bez restartu aplikacji. `SEED_PASSWORD` nie wpływa
-na hasła kont tworzonych przez formularz.
+### 6. Create a user account
 
-### Reset hasła istniejącego konta
+1. As an administrator, open `Użytkownicy → Nowy użytkownik` (Users → New user).
+2. Enter a unique username and email address, first name, last name, and password.
+3. Select the `USER` role and check `Konto aktywne` (Account active).
+4. Save the account.
+5. Log out or open the application in a private browser window.
+6. Log in with the username and password entered in the account creation form.
 
-Reset nie wymaga usuwania bazy ani wolumenu. Zatrzymaj aplikację i w lokalnym
-pliku `.env` ustaw:
+The account is available immediately, without restarting the application.
+`SEED_PASSWORD` does not affect its password. The administrator can then add the
+user to a project and assign tasks to them.
+
+### Reset an existing account's password
+
+Resetting a password does not require deleting the database or its volume.
+Stop the application and set the following values in your local `.env` file:
 
 ```properties
 SEED_ENABLED=true
-SEED_PASSWORD=WybraneNoweHaslo123!
+SEED_PASSWORD=YourNewPassword123!
 SEED_RESET_USER=admin
 ```
 
-Uruchom ponownie aplikację. `DataInitializer` zmieni wyłącznie hasło wskazanego
-użytkownika, zapisując hash BCrypt. Nie zmieni jego roli, aktywności, projektów
-ani zadań. Inne konta zachowają swoje hasła. Możesz wskazać inny login zamiast
-`admin`. Nieistniejący login lub niepoprawne hasło zatrzyma uruchomienie z błędem.
+Restart the application. `DataInitializer` changes only the specified user's
+password, storing a BCrypt hash. It does not change their role, active status,
+projects, or tasks. Other accounts keep their passwords. You can specify another
+username instead of `admin`. A nonexistent username or an invalid password causes
+startup to fail with an error.
 
-Po udanym resecie usuń `SEED_RESET_USER` z `.env` lub pozostaw pustą wartość:
-`SEED_RESET_USER=`. W przeciwnym razie reset powtórzy się przy kolejnym starcie.
-Bez tej opcji inicjalizator nadal tworzy dane jedynie w pustej bazie.
+After a successful reset, remove `SEED_RESET_USER` from `.env` or leave its value
+empty: `SEED_RESET_USER=`. Otherwise, the reset will run again on the next startup.
+Without this option, the initializer continues to create data only in an empty database.
 
-Konfiguracja PostgreSQL jest domyślna. Compose i Spring Boot wczytują ten sam
-lokalny plik `.env`; jest pomijany przez Git. Stosuj prosty zapis
-`NAZWA=wartość` bez cudzysłowów, spacji, znaków `$`, `#` i backslashy w hasłach,
-aby był zgodny z oboma czytnikami. Wygenerowane hasła używają znaków szesnastkowych.
-Można też ustawić zmienne środowiskowe zamiast pliku; mają wyższy priorytet.
+PostgreSQL is the default configuration. Compose and Spring Boot read the same
+local `.env` file, which is ignored by Git. Use the simple `NAME=value` format
+without quotes, spaces, `$`, `#`, or backslashes in passwords to keep it compatible
+with both readers. Generated passwords use hexadecimal characters.
+You can also set environment variables instead of using the file; they take precedence.
 
-Połączenie z IntelliJ lub narzędzia do baz:
+Connection settings for IntelliJ or a database tool:
 
-| Parametr | Wartość domyślna |
+| Parameter | Default value |
 |---|---|
 | Host | localhost |
 | Port | 5432 |
-| Baza | projectly |
-| Użytkownik | projectly |
-| Hasło | wartość `DB_PASSWORD` z `.env` |
+| Database | projectly |
+| User | projectly |
+| Password | `DB_PASSWORD` value from `.env` |
 | JDBC URL | jdbc:postgresql://localhost:5432/projectly |
 
-Jeżeli port 5432 jest zajęty, zmień `DB_PORT` w `.env`. Aplikacja i Compose
-użyją nowego portu. Pełny adres można nadpisać zmienną `DB_URL` w aplikacji.
-Baza jest udostępniona tylko na interfejsie `127.0.0.1`.
+If port 5432 is already in use, change `DB_PORT` in `.env`. The application and
+Compose will use the new port. You can override the full connection URL with the
+application's `DB_URL` variable. The database is exposed only on `127.0.0.1`.
 
-W IntelliJ ustaw JDK 21 i katalog roboczy na katalog główny Projectly.
-Hibernate tworzy i aktualizuje schemat przez `ddl-auto=update`.
+In IntelliJ, select JDK 21 and set the working directory to the Projectly root.
+Hibernate creates and updates the schema through `ddl-auto=update`.
 
-Przydatne polecenia:
+Useful commands:
 
 ```sh
 docker compose ps
@@ -150,66 +157,67 @@ docker compose stop
 docker compose start --wait
 ```
 
-Dane pozostają w wolumenie `projectly_postgres_data` po zatrzymaniu lub ponownym
-utworzeniu kontenera. Zmiana haseł w `.env` nie zmienia hasła w już utworzonej
-bazie; wymaga osobnej zmiany w PostgreSQL. Nie usuwaj wolumenu, jeśli chcesz
-zachować dane.
+Data remains in the `projectly_postgres_data` volume after the container is stopped
+or recreated. Changing passwords in `.env` does not change the password in an
+existing database; that requires a separate change in PostgreSQL. Do not delete
+the volume if you want to keep your data.
 
-Opis obrazu: [Docker Official Image PostgreSQL](https://hub.docker.com/_/postgres).
-Wczytywanie pliku konfiguracyjnego:
+Image documentation: [Docker Official Image PostgreSQL](https://hub.docker.com/_/postgres).
+Configuration file loading:
 [Spring Boot external configuration](https://docs.spring.io/spring-boot/3.5/reference/features/external-config.html).
 
-## Budowanie i testy
+## Building and testing
 
 ```sh
 ./mvnw clean verify
 ```
 
-Możesz także uruchomić zbudowany plik JAR z głównego katalogu projektu,
-po uruchomieniu bazy:
+You can also run the built JAR from the project root after starting the database:
 
 ```sh
 java -jar target/projectly-1.0.0.jar
 ```
 
-Aktualny plik JAR powstaje w `target/`.
+The current JAR is generated in `target/`.
 
-Testy integracyjne wykorzystują oddzielne bazy H2, rzeczywiste repozytoria JPA i MockMvc.
-Sprawdzają użytkowników, projekty, członkostwa, zadania, uprawnienia, logowanie,
-CSRF, walidację oraz renderowanie wszystkich widoków przy wyłączonym Open Session
-in View. Nie wymagają uruchomionej bazy PostgreSQL.
+Integration tests use separate H2 databases, real JPA repositories, and MockMvc.
+They cover users, projects, memberships, tasks, permissions, login, CSRF,
+validation, and rendering all views with Open Session in View disabled.
+They do not require a running PostgreSQL database.
 
-Cztery testy jednostkowe w `BusinessRulesUnitTest` uruchamiają zwykłe obiekty
-usług z zależnościami zastąpionymi przez Mockito, bez kontekstu Springa, bazy
-i Dockera. Sprawdzają zajęty login, duplikat członkostwa, przypisanie zadania
-osobie spoza projektu oraz odmowę zmiany statusu cudzego zadania. Kontrolują
-również brak zapisu niepoprawnych danych i zachowanie pierwotnego statusu.
-Możesz uruchomić wyłącznie te testy:
+The four unit tests in `BusinessRulesUnitTest` use plain service objects with
+Mockito dependencies, without a Spring context, database, or Docker.
+They check an already taken username, duplicate membership, assigning a task to
+someone outside the project, and refusing a status change on another user's task.
+They also verify that invalid data is not saved and the original status is preserved.
+You can run just these tests:
 
 ```sh
 ./mvnw -Dtest=BusinessRulesUnitTest test
 ```
 
-## Funkcjonalności
+## Features
 
 ADMIN:
-- Dashboard ze statystykami globalnymi.
-- Tworzenie i edycja użytkowników oraz usuwanie lub blokowanie kont.
-- Tworzenie, edycja i usuwanie projektów; wybór właściciela.
-- Dodawanie i usuwanie członków projektu.
-- Tworzenie, przypisywanie, edycja i usuwanie zadań.
-- Statusy TODO / IN_PROGRESS / DONE, priorytety LOW / MEDIUM / HIGH i termin.
+
+- Dashboard with global statistics.
+- Create and edit users, and delete or deactivate accounts.
+- Create, edit, and delete projects; select an owner.
+- Add and remove project members.
+- Create, assign, edit, and delete tasks.
+- TODO / IN_PROGRESS / DONE statuses, LOW / MEDIUM / HIGH priorities, and a due date.
 
 USER:
-- Dashboard ze statystykami własnych zadań i dostępnych projektów.
-- Projekty, których jest właścicielem lub członkiem.
-- Własne zadania i filtrowanie ich według statusu.
-- Szczegóły i zmiana statusu wyłącznie własnych zadań.
 
-Zakres nie obejmuje zespołów, diagramów, notatek, raportów, ewidencji czasu,
-zgłoszeń, podzadań, komentarzy, plików, powiadomień ani osobnego frontendu REST.
+- Dashboard with statistics for their own tasks and available projects.
+- Access to projects they own or belong to.
+- View their own tasks and filter them by status.
+- View details and change the status of their own tasks only.
 
-## Struktura
+The scope does not include teams, diagrams, notes, reports, time tracking,
+tickets, subtasks, comments, files, notifications, or a separate REST frontend.
+
+## Structure
 
 ```text
 src/main/java/org/example/
@@ -219,23 +227,23 @@ src/main/java/org/example/
 │   ├── entity/    User, Project, ProjectMember, Task
 │   ├── enums/     Role, TaskStatus, Priority
 │   └── dto/       UserForm, ProjectForm, TaskForm
-├── repository/    cztery interfejsy JpaRepository
+├── repository/    four JpaRepository interfaces
 ├── service/       UserService, ProjectService, TaskService, AccessService
-├── controller/    logowanie, dashboard, projekty, zadania, użytkownicy
-└── exception/     wyjątki i obsługa 400/403/404/409
+├── controller/    login, dashboard, projects, tasks, users
+└── exception/     exceptions and 400/403/404/409 handling
 src/main/resources/
-├── templates/     fragmenty, login, dashboard, projects, tasks, users, error
-├── static/css/    responsywny CSS bez zewnętrznych zależności
+├── templates/     fragments, login, dashboard, projects, tasks, users, error
+├── static/css/    responsive CSS without external dependencies
 └── application.yml
-src/test/          testy usług i przepływów MVC
+src/test/          service and MVC flow tests
 ```
 
-Żądania przechodzą przez Controller → Service → Repository → Database.
-Kontrolery obsługują formularze i przekierowania; transakcje i reguły biznesowe
-są w usługach. Formularze nie wiążą bezpośrednio encji ani pól takich jak
-identyfikator projektu zadania lub hash hasła.
+Requests flow through Controller → Service → Repository → Database.
+Controllers handle forms and redirects; services contain transactions and business
+rules. Forms do not bind entities directly or expose fields such as a task's
+project ID or a password hash.
 
-## Model danych i reguły
+## Data model and rules
 
 ```mermaid
 erDiagram
@@ -246,49 +254,50 @@ erDiagram
     USER o|--o{ TASK : assigned
 ```
 
-- `User`: unikalne login i email, imię, nazwisko, hash BCrypt, rola i aktywność.
-- `Project`: nazwa, opis, automatyczna data utworzenia i wymagany właściciel.
-- `ProjectMember`: osobna encja pośrednia z unikalną parą projekt/użytkownik
-  i automatyczną datą dołączenia. Brak bezpośredniego `@ManyToMany`.
-- `Task`: tytuł, opis, status, priorytet, opcjonalny termin, automatyczna data,
-  wymagany projekt i opcjonalny wykonawca.
+- `User`: unique username and email, first name, last name, BCrypt hash, role, and active status.
+- `Project`: name, description, automatic creation date, and a required owner.
+- `ProjectMember`: a separate join entity with a unique project/user pair
+  and an automatic join date. No direct `@ManyToMany` relationship.
+- `Task`: title, description, status, priority, optional due date, automatic creation
+  date, required project, and optional assignee.
 
-Relacje do pojedynczych encji mają `LAZY`; repozytoria pobierają potrzebne dane
-przez `EntityGraph`. Kolekcje usuwanych dzieci projektu mają wyłącznie
-`CascadeType.REMOVE` i `orphanRemoval`. Żadna relacja nie usuwa kaskadowo użytkownika.
-Odwrotne kolekcje w `User` są celowo pominięte: te same relacje reprezentują
-klucze obce i zapytania repozytoriów. Encje nie mają metod equals/hashCode/toString
-obejmujących relacje.
+Relationships to individual entities use `LAZY` fetching; repositories fetch the
+required data through `EntityGraph`. Collections of project child entities use only
+`CascadeType.REMOVE` and `orphanRemoval`. No relationship cascades user deletion.
+Inverse collections in `User` are intentionally omitted: the same relationships
+are represented by foreign keys and repository queries. Entities do not have
+equals/hashCode/toString methods that include relationships.
 
-Dodatkowe zasady:
-- Właściciel ma dostęp do projektu bez dodatkowego członkostwa.
-- Wykonawca musi być aktywnym członkiem lub właścicielem.
-- Usunięcie członka odpina jego zadania; administrator może przypisać je ponownie.
-- Zmiana właściciela pozostawia poprzedniego jako członka, zachowując poprawność
-  istniejących przypisań; usuwa dodatkowe członkostwo nowego właściciela.
-- Usunięcie projektu usuwa jego zadania i członkostwa, pozostawiając użytkowników.
-- Usunięcie użytkownika z powiązaniami blokuje konto; bez powiązań usuwa rekord.
-- Ostatni aktywny administrator jest chroniony przed zablokowaniem i zmianą roli.
-- Zwykła edycja użytkownika zachowuje istniejące hasło.
-- Login jest normalizowany do małych liter; email także do małych liter.
-- USER widzi na stronie projektu wyłącznie swoje zadania. ADMIN widzi wszystkie.
-- Reguły dostępu do zasobów są sprawdzane w usługach, również przy wysłaniu ręcznie
-  spreparowanego żądania. Aktywność konta jest sprawdzana przy kolejnych operacjach.
-- Rola w nawigacji jest odczytywana z bazy; po zmianie roli należy zalogować się
-  ponownie, aby odświeżyć uprawnienia zapisane w sesji Spring Security.
-- Sesyjne logowanie, logout przez POST i ochrona CSRF pozostają włączone.
+Additional rules:
 
-## Scenariusz prezentacji
+- Owners can access their projects without an additional membership.
+- Assignees must be active members or owners of the project.
+- Removing a member unassigns their tasks; an administrator can reassign them.
+- Changing the owner keeps the previous owner as a member, preserving existing
+  assignments, and removes any additional membership of the new owner.
+- Deleting a project removes its tasks and memberships while keeping users.
+- Deleting a user with existing relationships deactivates the account; otherwise, it deletes the record.
+- The last active administrator is protected against deactivation and role changes.
+- Regular user edits preserve the existing password.
+- Usernames and email addresses are normalized to lowercase.
+- USER sees only their own tasks on a project page. ADMIN sees all tasks.
+- Resource access rules are checked in services, including for manually crafted
+  requests. Account active status is checked on subsequent operations.
+- The role shown in navigation is read from the database; after a role change,
+  the user must log in again to refresh the permissions stored in the Spring Security session.
+- Session-based login, POST logout, and CSRF protection remain enabled.
 
-1. Uruchom PostgreSQL przez Docker Compose, następnie aplikację i zaloguj się jako `admin`.
-2. Utwórz użytkownika, projekt i członkostwo; dodaj zadanie z wykonawcą.
-3. Pokaż walidację pustego tytułu i odmowę ponownego dodania członka.
-4. Zaloguj się jako wykonawca i zmień status zadania.
-5. Pokaż filtrowanie w „Moje zadania” i brak dostępu do administracji.
-6. Ponownie jako administrator usuń członka i pokaż odpięte zadanie.
+## Demo walkthrough
 
-## Podgląd
+1. Start PostgreSQL through Docker Compose, then start the application and log in as `admin`.
+2. Create a user, project, and membership; add a task with an assignee.
+3. Demonstrate empty-title validation and rejection of a duplicate membership.
+4. Log in as the assignee and change the task status.
+5. Demonstrate filtering in “Moje zadania” (My tasks) and restricted access to administration.
+6. Log in as an administrator again, remove the member, and show the unassigned task.
 
-![Pulpit administratora](docs/screenshots/dashboard.png)
+## Preview
 
-Raport sprawdzenia projektu znajduje się w [docs/VALIDATION.md](docs/VALIDATION.md).
+![Administrator dashboard](docs/screenshots/dashboard.png)
+
+The project validation report is available in [docs/VALIDATION.md](docs/VALIDATION.md).
